@@ -21,7 +21,8 @@ on_exit()
 
 trap on_exit EXIT
 
-IFS="||"
+OIFS=$IFS
+IFS=$'\t' #If you changed the symbol in the script, change this. 
 clementinemonitor | while read STATUS TRACKNUM TITLE ARTIST ALBUM TOTALTIME FILE ART CRUFT
 do
 
@@ -62,3 +63,5 @@ do
   # reading a half-written file.
   mv $CONKY_DATA $CONKY_DATA_FINAL
 done
+
+IFS=$OIFS

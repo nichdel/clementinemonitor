@@ -50,7 +50,7 @@ import math
 
 prevout = ""
 
-SEP = "||"
+SEP = '\t'
 
 def printifchanged( out ):
   '''Write string to stdout if it is different from the last thing we wrote.
