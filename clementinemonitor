@@ -50,6 +50,8 @@ import math
 
 prevout = ""
 
+SEP = "||"
+
 def printifchanged( out ):
   '''Write string to stdout if it is different from the last thing we wrote.
   Will exit if we detect a broken pipe. NOTE: Need to use os._exit as the
@@ -83,7 +85,7 @@ def metatostr( meta ):
   if arturl.startswith("file://"):
     arturl = arturl[7:]
 
-  return str(meta["tracknumber"]) + '|' + meta["title"] + '|' + meta["artist"] + '|' + meta["album"] + '|' + tottime + '|' + meta["location"] + '|' + arturl
+  return str(meta["tracknumber"]) + SEP + meta["title"] + SEP + meta["artist"] + SEP + meta["album"] + SEP + tottime + SEP + meta["location"] + SEP + arturl
 
 def printcurrent():
   '''Get the current status and song data from the player and print it.'''
@@ -94,9 +96,9 @@ def printcurrent():
   else:
     meta = iface.GetMetadata()
     if status == 0:
-      printifchanged("playing|" + metatostr(meta))
+      printifchanged("playing" + SEP + metatostr(meta))
     elif status == 1:
-      printifchanged("paused|" + metatostr(meta))
+      printifchanged("paused" + SEP + metatostr(meta))
 
 def trackchanged(data):
   '''Callback handler for a TrackChange event.'''
