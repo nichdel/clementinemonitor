@@ -113,7 +113,14 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
 session_bus = dbus.SessionBus()
 
-player = session_bus.get_object('org.mpris.clementine', '/Player')
+# Wait until clementine is started
+player = None
+while (player == None):
+    try:
+        player = session_bus.get_object('org.mpris.clementine', '/Player')
+    except Exception:
+        player = None
+
 iface = dbus.Interface(player, dbus_interface='org.freedesktop.MediaPlayer')
 iface.connect_to_signal("TrackChange", trackchanged)
 iface.connect_to_signal("StatusChange", statuschanged)
