@@ -47,10 +47,12 @@ import gobject
 import sys
 import os
 import math
+import time
 
 prevout = ""
 
 SEP = '\t'
+META_KEYS = ["tracknumber", "title", "artist", "album", "location"]
 
 def printifchanged( out ):
   '''Write string to stdout if it is different from the last thing we wrote.
@@ -85,7 +87,16 @@ def metatostr( meta ):
   if arturl.startswith("file://"):
     arturl = arturl[7:]
 
-  return str(meta["tracknumber"]) + SEP + meta["title"] + SEP + meta["artist"] + SEP + meta["album"] + SEP + tottime + SEP + meta["location"] + SEP + arturl
+  # Try to get the other fields, fail gently
+  output = ""
+  for key in META_KEYS:
+    try:
+        output += meta[key] + SEP
+    except Exception:
+        output += "No listed " + key + SEP
+  output += arturl
+  
+  return output
 
 def printcurrent():
   '''Get the current status and song data from the player and print it.'''
@@ -113,13 +124,15 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
 
 session_bus = dbus.SessionBus()
 
-# Wait until clementine is started
+# Try until clementine is started
 player = None
 while (player == None):
-    try:
-        player = session_bus.get_object('org.mpris.clementine', '/Player')
-    except Exception:
-        player = None
+  try:
+    player = session_bus.get_object('org.mpris.clementine', '/Player')
+  except Exception:
+    player = None
+    # Sleep when we fail to save resources
+    time.sleep(1)
 
 iface = dbus.Interface(player, dbus_interface='org.freedesktop.MediaPlayer')
 iface.connect_to_signal("TrackChange", trackchanged)
